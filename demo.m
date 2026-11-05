@@ -82,37 +82,22 @@ fprintf('Parameters: anchor=%d, d=%d, lambda=%.6g, mu=%.6g\n', ...
     anchor, d, lambda, mu);
 
 %% Run experiments
-res_all = zeros(num_runs, 8);
-time_all = zeros(num_runs, 1);
+%% Random seed
+rng(11, 'twister');
 
-for run_id = 1:num_runs
+%% Run experiment
+fprintf('\nRunning experiment with seed = 11\n');
 
-    rng(base_seed + run_id, 'twister');
+tic;
+[U, A, C, D, G, F, obj, pred_label] = double_self_paced_with_rank( ...
+    X_data, Y_data, anchor, d, lambda, mu);
+elapsed_time = toc;
 
-    fprintf('\nRun %d/%d\n', run_id, num_runs);
+%% Evaluation
+res = Clustering8Measure(Y_data, pred_label);
 
-    tic;
-    [U, A, C, D, G, F, obj, pred_label] = double_self_paced_with_rank( ...
-        X_data, Y_data, anchor, d, lambda, mu);
-    elapsed_time = toc;
-
-    res = Clustering8Measure(Y_data, pred_label);
-
-    res_all(run_id, :) = res;
-    time_all(run_id) = elapsed_time;
-
-    fprintf('ACC=%.4f, NMI=%.4f, Purity=%.4f, Fscore=%.4f, Time=%.2fs\n', ...
-        res(1), res(2), res(3), res(4), elapsed_time);
-
-end
-
-%% Final results
-mean_res = mean(res_all, 1);
-std_res = std(res_all, 0, 1);
-mean_time = mean(time_all);
-
-fprintf('\nFinal Results on %s\n', dataName);
-fprintf('ACC     = %.2f ± %.2f\n', mean_res(1)*100, std_res(1)*100);
-fprintf('NMI     = %.2f ± %.2f\n', mean_res(2)*100, std_res(2)*100);
-fprintf('Purity  = %.2f ± %.2f\n', mean_res(3)*100, std_res(3)*100);
-fprintf('Fscore  = %.2f ± %.2f\n', mean_res(4)*100, std_res(4)*100);
+fprintf('\nResults on %s\n', dataName);
+fprintf('ACC     = %.4f\n', res(1));
+fprintf('NMI     = %.4f\n', res(2));
+fprintf('Purity  = %.4f\n', res(3));
+fprintf('Fscore  = %.4f\n', res(4));
