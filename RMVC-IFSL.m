@@ -113,7 +113,6 @@ while flag
     for i = 1:numview
         % equivalent to: diag(E_L_f{i})*(X{i}-U{i}*A*C-D{i})
         residual_s = E_L_f{i} .* (X{i} - U{i} * A * C - D{i});
-
         lsi = lsi + sum(residual_s.^2, 1);
     end
 
